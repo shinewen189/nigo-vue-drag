@@ -32,7 +32,14 @@
             },
             dragAry: {
                 type: Array,
-                default:[]
+                default(){
+                    return Array.from({length : 10},()=>{
+                        return  {
+                            text : index ,
+                            color : 'red'
+                        }
+                    })
+                }
             }
         },
         data() {

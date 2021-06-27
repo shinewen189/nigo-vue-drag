@@ -5,13 +5,11 @@
 ## Example Usage
 `    import Tab from 'nigo-vue-drag'
 `
-
 ```
-const list = [{text :'1',color :'red'}]
  <drag 
-    :drag-ary="list" 
-    :box-width="num" 
-    :drag-height="200"
+    :drag-ary="[{text : 1 , color : 'red'},{text : 2 , color : 'red'}]" 
+    box-width="500" 
+    drag-height="200"
 ></drag>
 
 ```

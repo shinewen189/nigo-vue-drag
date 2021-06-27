@@ -5,7 +5,7 @@ module.exports = {
     entry: './src/index.js',
     output: {
         path: path.resolve(__dirname, './dist'),//输出路径，就是上步骤中新建的dist目录
-        publicPath: '/dist/',//路径
+        publicPath: './dist',//路径
 
         filename: 'nigo-vue-drag.js',//打包之后的名称
         library: 'nigo-vue-drag', // 指定的就是你使用require时的模块名
@@ -52,9 +52,8 @@ module.exports = {
         extensions: ['*', '.js', '.vue', '.json']
     },
     devServer: {
-        historyApiFallback: true,
-        noInfo: true,
-        overlay: true
+        contentBase: path.resolve(__dirname, './dist'),
+        open: true, // 自动打开浏览器
     },
     performance: {
         hints: false
@@ -82,3 +81,6 @@ if (process.env.NODE_ENV === 'production') {
         })
     ])
 }
+
+
+
