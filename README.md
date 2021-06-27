@@ -1,5 +1,5 @@
 
-## nigo-vue-tab v1.0.5
+## nigo-vue-tab v1.0.1
 `    npm install nigo-vue-drag
 `
 ## Example Usage
@@ -7,6 +7,7 @@
 `
 
 ```
+const list = [{text :'1',color :'red'}]
  <drag 
     :drag-ary="list" 
     :box-width="num" 
@@ -16,4 +17,4 @@
 ```
 
  ### Keywords
-vue JavaScript tab
+vue 、JavaScript 、drag
