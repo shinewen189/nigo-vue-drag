@@ -1,6 +1,6 @@
 {
   "name": "nigo-vue-drag",
-  "version": "1.0.3",
+  "version": "1.0.5",
   "description": "vue拖拽组件",
   "author": "nigo",
   "main": "./dist/nigo-vue-drag.js",

@@ -1,5 +1,5 @@
 
-## nigo-vue-tab v1.0.1
+## nigo-vue-tab v1.0.5
 `    npm install nigo-vue-drag
 `
 ## Example Usage
