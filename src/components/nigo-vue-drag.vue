@@ -1,17 +1,24 @@
 <template>
-    <div class="drag ">
-        <div class="blockDiv" :style="{width : boxWidth+'px'}">
-            <div class="box" v-show="isDrag"
-                 :style="{transform: `translate(${x}px,${y}px)` ,width:dragInfo.width,height:dragInfo.height,lineHeight: dragInfo.height,background:dragInfo.color}">
-                {{dragInfo.text}}
+    <div class="drag">
+        <div :style="{width : boxWidth==='auto'? 'auto': boxWidth+'px'}"
+             :class="getmode"
+        >
+            <div :style="{transform: `translate(${x}px,${y}px)` ,
+            width:dragInfo.width,height:dragInfo.height,
+            background:dragInfo.color}"
+                 class="box"
+                 v-show="isDrag" v-html="dragAry[dragInfo.index].html">
             </div>
-            <div class="block" :ref="'block'+index"
-                 :class="[isTargetDrag&&dragIndex ===index? 'isTargetDrag':'']"
-                 :style="{background:isDrag && index===Number(dragInfo.index ) ?actInfo.color: item.color,height:dragHeight+'px',lineHeight:dragHeight+'px'}"
-                 @mousedown="dragMove($event,index)"
+            <div :class="[setBlcock,isTargetDrag&&dragIndex ===index? 'isTargetDrag':'',!dragMode&&isDrag&&dragInfo.index ===index?'active':'']"
+                 :key="index"
+                 :ref="'block'+index"
+                 :style="{background:dragMode&&isDrag && index===Number(dragInfo.index) ?actInfo.color: item.color ,
+                 height:dragHeight+'px'}"
+                 @mousedown.prevent="dragMove($event,index)"
                  v-for="(item,index) in dragAry"
-                 :key="index">
-                {{isDrag && index===Number(dragInfo.index )?actInfo.text : item.text}}
+                 v-html="item.html"
+
+            >
             </div>
         </div>
     </div>
@@ -22,9 +29,18 @@
     export default {
         name: 'drag',
         props: {
-            boxWidth: {
+            // 1:change |0:insert
+            dragMode: {
                 type: Number,
-                default: 500
+                default: 0
+            },
+            mode: {
+                type: String,
+                default: 'flex'
+            },
+            boxWidth: {
+                type: [Number, String],
+                default: 'auto'
             },
             dragHeight: {
                 type: Number,
@@ -32,14 +48,23 @@
             },
             dragAry: {
                 type: Array,
-                default(){
-                    return Array.from({length : 10},()=>{
-                        return  {
-                            text : index ,
-                            color : 'red'
+                default() {
+                    return Array.from({length: 10}, (_, index) => {
+                        return {
+                            text: index,
+                            color: 'red'
                         }
                     })
                 }
+            }
+        },
+        computed: {
+
+            getmode() {
+                return this.mode === 'list' ? 'blockList' : 'blockFlex'
+            },
+            setBlcock() {
+                return this.mode === 'list' ? 'lblock' : 'fblock'
             }
         },
         data() {
@@ -50,7 +75,6 @@
                 dragInfo: {
                     width: '',
                     height: '',
-                    text: '',
                     background: '',
                     index: 0
                 },
@@ -64,10 +88,9 @@
         },
         methods: {
             dragMove(ev, index) {
-                ev.preventDefault()
-                const {color, text} = this.dragAry[index]
+                const {color} = this.dragAry[index]
                 const {clientX, clientY} = ev
-                const {offsetLeft, offsetTop, offsetWidth, offsetHeight, parentElement} = ev.target
+                const {offsetLeft, offsetTop, offsetWidth, offsetHeight, parentElement} = ev.currentTarget
                 const dx = clientX - offsetLeft, dy = clientY - offsetTop
                 let moveX, moveY
                 this.isDrag = true
@@ -76,7 +99,6 @@
                 this.dragInfo.width = offsetWidth + 'px'
                 this.dragInfo.height = offsetHeight + 'px'
                 this.dragInfo.index = index
-                this.dragInfo.text = text
                 this.dragInfo.color = color
                 document.onmousemove = (moveEv) => {
                     moveEv.preventDefault()
@@ -98,10 +120,10 @@
                         const [{offsetLeft: ox, offsetTop: oy}] = this.$refs['block' + indexs]
                         if (moveX + offsetWidth / 2 > ox && moveX + offsetWidth / 2 < ox + offsetWidth &&
                             moveY + offsetHeight / 2 > oy && moveY + offsetHeight / 2 < oy + offsetHeight) {
-                            this.actInfo.color = this.dragAry[indexs].color
-                            this.actInfo.text = this.dragAry[indexs].text
                             this.dragIndex = indexs
                             this.isTargetDrag = true
+                            this.actInfo.text = this.dragAry[indexs].text
+                            this.actInfo.color = this.dragAry[indexs].color
                         }
                     })
 
@@ -111,9 +133,16 @@
                 document.onmouseup = () => {
                     if (this.isTargetDrag) {
                         const tempIndex = index, temp = this.dragAry[tempIndex]
-                        this.$set(this.dragAry, tempIndex, this.dragAry[this.dragIndex])
-                        this.$set(this.dragAry, this.dragIndex, temp)
+                        if (this.dragMode) {
+                            this.$set(this.dragAry, tempIndex, this.dragAry[this.dragIndex])
+                            this.$set(this.dragAry, this.dragIndex, temp)
+                        } else {
+                            this.dragAry.splice(this.dragIndex + 1, 0, temp)
+                            this.dragAry.splice(tempIndex, 1)
+                        }
+                        this.$emit('dragMouseup', {index, dragIndex: this.dragIndex})
                     }
+
                     this.isDrag = false
                     this.isTargetDrag = false
                     document.onmousemove = null
@@ -126,19 +155,20 @@
 
 <style scoped>
     .box {
-        line-height: 50px;
         color: #fff;
         position: absolute;
         cursor: move;
+        overflow: hidden;
         transition-duration: 100ms;
         transition-timing-function: ease-out;
     }
 
     .active {
+        background: #fff !important;
         border: 1px dashed #000;
     }
 
-    .blockDiv {
+    .blockFlex {
         width: 500px;
         display: flex;
         margin: 0 auto;
@@ -148,11 +178,29 @@
         transition-timing-function: ease-out;
     }
 
-    .block {
+    .fblock {
         width: calc(calc(100% / 3) - 10px);
         margin: 5px;
         height: 50px;
-        line-height: 50px;
+        color: #fff;
+        box-sizing: border-box;
+        background: red;
+        cursor: move;
+        transition-duration: 500ms;
+        transition-timing-function: ease;
+    }
+
+    .blockList {
+        position: relative;
+        margin: 0 auto;
+        transition-duration: 500ms;
+        transition-timing-function: ease-out;
+    }
+
+    .lblock {
+        width: 100%;
+        height: 50px;
+        margin-bottom: 20px;
         color: #fff;
         box-sizing: border-box;
         background: red;
