@@ -26,8 +26,8 @@
 | box-width | 盒子宽度 | String | auto |
 | drag-height | 拖拽元素高度 | String | 100 |
 | drag-mode | 是插入模式还是交换位置 | Number | 0 |
-| drag-ary | 传入拖拽的数组,object字段可以添加color 和html | Array | 单元格 |
-| dragMouseup | 返回拖拽的当前和目标索引值 | Events | 单元格 |
+| drag-ary | 传入拖拽的数组,object字段可以添加color 和html | Array | [] |
+| dragMouseup | 返回拖拽的当前和目标索引值 | Events |  |
 
 
 ## 更新
