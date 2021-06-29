@@ -1,12 +1,12 @@
 
-## nigo-vue-drag v1.1.2
+## nigo-vue-drag v1.1.3
 `    npm install nigo-vue-drag
 `
 
-`    yarn install nigo-vue-drag
+`    yarn add nigo-vue-drag
 `
 ## 使用示例
-`    import Tab from 'nigo-vue-drag'
+`    import Drag from 'nigo-vue-drag'
 `
 ```
   <drag
