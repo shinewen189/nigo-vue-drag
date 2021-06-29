@@ -1,5 +1,5 @@
 
-## nigo-vue-drag v1.1.0
+## nigo-vue-drag v1.1.2
 `    npm install nigo-vue-drag
 `
 
@@ -34,6 +34,8 @@
 1.增加mode  flex| list
 
 2.增加返回拖拽的当前和目标索引值的事件dragMouseup	
+
+3.增加排序模式  交换模式  插入模式
 
   
  ### Keywords

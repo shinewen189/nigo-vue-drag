@@ -9,15 +9,17 @@
                  class="box"
                  v-show="isDrag" v-html="dragAry[dragInfo.index].html">
             </div>
-            <div :class="[setBlcock,isTargetDrag&&dragIndex ===index? 'isTargetDrag':'',!dragMode&&isDrag&&dragInfo.index ===index?'active':'']"
+            <div :class="[
+                setBlcock,isTargetDrag&&dragIndex ===index? 'isTargetDrag':'',
+            !dragMode&&isDrag&&dragInfo.index ===index?'active':'',
+            isTargetDrag&&dragIndex ===index&&dragMode?'dragModeAct':'']"
                  :key="index"
                  :ref="'block'+index"
                  :style="{background:dragMode&&isDrag && index===Number(dragInfo.index) ?actInfo.color: item.color ,
-                 height:dragHeight+'px'}"
+                 height:dragHeight==='auto'?'auto':dragHeight+'px'}"
                  @mousedown.prevent="dragMove($event,index)"
                  v-for="(item,index) in dragAry"
-                 v-html="item.html"
-
+                 v-html="dragMode&&isDrag && index===Number(dragInfo.index)?actInfo.html :item.html"
             >
             </div>
         </div>
@@ -29,64 +31,67 @@
     export default {
         name: 'drag',
         props: {
-            // 1:change |0:insert
+            //元素排序模式   1:change |0:insert
             dragMode: {
-                type: Number,
-                default: 0
+                type: [Number, Boolean],
+                default: 1
             },
+            //元素布局模式   flex |list
             mode: {
                 type: String,
                 default: 'flex'
             },
+            //盒子宽度  'auto'| number
             boxWidth: {
                 type: [Number, String],
                 default: 'auto'
             },
+            //拖拽元素高度   'auto'| 自定义高度
             dragHeight: {
-                type: Number,
+                type: [Number,String],
                 default: 50
             },
+            //传入的元素数组    [color : '',html : '']
             dragAry: {
                 type: Array,
-                default() {
-                    return Array.from({length: 10}, (_, index) => {
-                        return {
-                            text: index,
-                            color: 'red'
-                        }
-                    })
-                }
+                default:[]
             }
         },
         computed: {
-
+            // 计算排列模式
             getmode() {
                 return this.mode === 'list' ? 'blockList' : 'blockFlex'
             },
+            // 计算排列模式
             setBlcock() {
                 return this.mode === 'list' ? 'lblock' : 'fblock'
             }
         },
         data() {
             return {
-                x: 0,
-                y: 0,
-                isDrag: false,
+                x: 0,  //拖拽的x坐标
+                y: 0,  // 拖拽的y坐标
+                isDrag: false,//是否在拖拽
+                //正在拖拽元素的信息
                 dragInfo: {
                     width: '',
                     height: '',
                     background: '',
                     index: 0
                 },
+                //目标元素信息
                 actInfo: {
                     color: '',
                     text: ''
                 },
+                //是否目标元素
                 isTargetDrag: false,
+                //目标元素索引值
                 dragIndex: null,
             }
         },
         methods: {
+            //拖拽逻辑
             dragMove(ev, index) {
                 const {color} = this.dragAry[index]
                 const {clientX, clientY} = ev
@@ -122,7 +127,7 @@
                             moveY + offsetHeight / 2 > oy && moveY + offsetHeight / 2 < oy + offsetHeight) {
                             this.dragIndex = indexs
                             this.isTargetDrag = true
-                            this.actInfo.text = this.dragAry[indexs].text
+                            this.actInfo.html = this.dragAry[indexs].html
                             this.actInfo.color = this.dragAry[indexs].color
                         }
                     })
@@ -158,9 +163,10 @@
         color: #fff;
         position: absolute;
         cursor: move;
-        overflow: hidden;
         transition-duration: 100ms;
         transition-timing-function: ease-out;
+        z-index: 111111;
+        background: red;
     }
 
     .active {
@@ -176,6 +182,8 @@
         position: relative;
         transition-duration: 500ms;
         transition-timing-function: ease-out;
+        overflow: hidden;
+
     }
 
     .fblock {
@@ -188,6 +196,7 @@
         cursor: move;
         transition-duration: 500ms;
         transition-timing-function: ease;
+        overflow: hidden;
     }
 
     .blockList {
@@ -211,8 +220,23 @@
 
 
     .isTargetDrag {
-        background: #fff !important;
-        border: 1px dashed red;
         cursor: move;
+        transform: scale(1.1);
+        transition-duration: 500ms;
+        transition-timing-function: ease-in;
+        position: relative;
+    }
+    .isTargetDrag:before{
+        border: 1px dashed red;
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
+
+    .dragModeAct {
+        background: #fff !important;
     }
 </style>
